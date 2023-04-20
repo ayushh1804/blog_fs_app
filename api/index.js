@@ -4,9 +4,9 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config()
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 const User = require('./models/User')
-const salt = bcrypt.genSaltSync(10);
-
+const secret= 'cdscgygcdgcydcsgyc767cdsghc'
 try {
     mongoose.connect(process.env.MONGO_CONNECTION_URL)
     console.log('Database Connection Successful')
@@ -14,7 +14,7 @@ try {
     alert(e)
 }
 
-app.use(cors())
+app.use(cors({Credentials:true,origin:'http://loalhost:3000'}))
 app.use(express.json())
 app.post('/register', async (req, res) => {
   try{
@@ -34,7 +34,14 @@ app.post('/login',async (req,res)=> {
     const {username,password} = req.body;
     const userDoc = await User.findOne({username});
    const passOk =  bcrypt.compareSync(password, userDoc.password)
-   res.json(passOk)
+   if (passOk){
+            jwt.sign({username,id:userDoc._id},secret,{}, (err,token)=>{
+                    if (err) throw err;
+                    res.cookie('token',token).json('ok')
+            })
+   }else{
+
+   }
 })
 
 app.get('/profile', (req,res) => {
