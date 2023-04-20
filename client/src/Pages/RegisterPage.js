@@ -4,8 +4,13 @@ const RegisterPage = () => {
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
 
-    const registerHandler =(e) => {
+    const registerHandler = async (e) => {
         e.preventDefault();
+        await fetch('http://localhost:4000/register', {
+            method: 'POST',
+            body: JSON.stringify({username, password}),
+            headers: {'Content-Type': 'application/json'}
+        })
     }
 
     return (
