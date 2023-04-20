@@ -55,5 +55,10 @@ div.posts p.info{
 }
 div.posts p.info a.author{
     color: #333;
-    
+
+}
+div.posts p.summary{
+    margin: 10px 0;
+    line-height: 1.5rem;
+
 }
