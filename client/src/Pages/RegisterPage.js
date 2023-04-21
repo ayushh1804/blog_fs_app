@@ -11,7 +11,7 @@ const RegisterPage = () => {
             body: JSON.stringify({username, password}),
             headers: {'Content-Type': 'application/json'}
         });
-        if(response.status === 200)
+        if(response.ok)
         alert('Registration Successfull')
         else
         alert('Registration Failed')
