@@ -29,12 +29,13 @@ data.set('title',title);
 data.set('summary',summary);
 data.set('content',content);
 data.set('file',files[0])
-const createPostHandler = (e) => {
+const createPostHandler = async (e) => {
     e.preventDefault();
-    fetch('http://localhost:4000/post',{
+    const response = await fetch('http://localhost:4000/post',{
         method: 'POST',
         body:data,
     })
+    
 }
 
     return (

@@ -7,6 +7,8 @@ require('dotenv').config()
 const cookieParser = require('cookie-parser')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const uploadMiddleware = multer({dest: 'uploads/'})
 const User = require('./models/User')
 const salt = bcrypt.genSaltSync(10)
 const secret = 'cdscgygcdgcydcsgyc767cdsghc'
@@ -75,8 +77,12 @@ app.post('/logout', (req, res) => {
     res.cookie('token', '').json('ok')
 })
 
-app.post('/post', (req,res) => {
-    
+app.post('/post',uploadMiddleware.single('file'), (req,res) => {
+const {originalname} = req.file;
+const parts = originalname.split('.');
+const ext = parts[parts.length - 1];
+
+
 })
 
 app.listen(4000);
