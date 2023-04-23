@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const fs = require('fs')
 const uploadMiddleware = multer({ dest: 'uploads/' })
-app.use('/uploads', express.static(__dirname+'/uploads'))
+app.use('/uploads', express.static(__dirname + '/uploads'))
 const User = require('./models/User')
 const Post = require('./models/Post')
 const salt = bcrypt.genSaltSync(10)
@@ -87,7 +87,7 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
     const newPath = path + '.' + ext;
     fs.renameSync(path, newPath)
 
-  
+
     const { token } = req.cookies;
     jwt.verify(token, secret, {}, async (err, info) => {
         if (err) throw err;
@@ -97,25 +97,61 @@ app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
             summary,
             content,
             cover: newPath,
-            author:info.id,
-    
+            author: info.id,
+
         })
         res.json(postDocument)
     })
 
 
 })
+app.put('/post', uploadMiddleware.single('file'), async (req, res) => {
+    let newPath = null;
+    if (req.file) {
 
+        const { originalname, path } = req.file;
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1];
+        newPath = path + '.' + ext;
+        fs.renameSync(path, newPath)
+
+    }
+
+    const { token } = req.cookies;
+    jwt.verify(token, secret, {}, async (err, info) => {
+        if (err) throw err;
+        const { id, title, summary, content } = req.body;
+        const postDocument = await Post.findById(id)
+        const isAuthor = JSON.stringify(postDocument.author) === JSON.stringify(info.id)
+        if (!isAuthor) {
+            return res.status(400).json('youre not the author')
+            // throw 'You are not the Author'
+        }
+        await postDocument.updateOne({
+            title,
+            summary,
+            content,
+            cover: newPath ? newPath : postDoc.cover
+        });
+
+        // res.json(postDoc);
+    })
+
+
+})
 app.get('/post', async (req, res) => {
-    const posts = await Post.find().populate('author',['username']).sort({createdAt: -1}).limit(20)
-    res.json(posts);
+    res.json(
+   await Post.find().populate('author', ['username']).sort({ createdAt: -1 }).limit(20))
+    // res.json(posts);
 })
 
-app.get('/post/:id', async (req,res)=> {
-    const {id} = req.params;
+app.get('/post/:id', async (req, res) => {
+    const { id } = req.params;
     // res.json(req.params)
     const postDoc = await Post.findById(id).populate('author', ['username'])
     res.json(postDoc)
 })
+
+
 
 app.listen(4000);
