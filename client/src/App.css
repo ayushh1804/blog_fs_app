@@ -131,3 +131,16 @@ div.post-page div.author {
 div.post-page div.content p {
   line-height: 1.6rem;
 }
+div.edit-row {
+  text-align: center;
+}
+div.post-page a.edit-btn {
+  background-color: #109fc7;
+  display: inline-block;
+  text-decoration: none;
+
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
