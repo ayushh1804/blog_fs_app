@@ -4,7 +4,8 @@ const PostSchema = new mongoose.Schema({
     title: String,
     summary: String,
     Content: String,
-    cover: String
+    cover: String,
+    author:{type: mongoose.Schema.Types.ObjectId, ref:'User'}
 }, {
     timestamps: true,
 }

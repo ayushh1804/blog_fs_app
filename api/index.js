@@ -9,7 +9,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const fs = require('fs')
-const uploadMiddleware = multer({dest: 'uploads/'})
+const uploadMiddleware = multer({ dest: 'uploads/' })
+app.use('/uploads', express.static(__dirname+'/uploads'))
 const User = require('./models/User')
 const Post = require('./models/Post')
 const salt = bcrypt.genSaltSync(10)
@@ -59,8 +60,8 @@ app.post('/login', async (req, res) => {
                 id: userDoc._id,
                 username
             });
-                    
-                })
+
+        })
     } else {
 
     }
@@ -79,27 +80,34 @@ app.post('/logout', (req, res) => {
     res.cookie('token', '').json('ok')
 })
 
-app.post('/post',uploadMiddleware.single('file'),async (req,res) => {
-const {originalname, path} = req.file;
-const parts = originalname.split('.');
-const ext = parts[parts.length - 1];
-const newPath = path+'.'+ext;
-fs.renameSync(path, newPath)
+app.post('/post', uploadMiddleware.single('file'), async (req, res) => {
+    const { originalname, path } = req.file;
+    const parts = originalname.split('.');
+    const ext = parts[parts.length - 1];
+    const newPath = path + '.' + ext;
+    fs.renameSync(path, newPath)
 
-const {title,summary,content} = req.body;
+  
+    const { token } = req.cookies;
+    jwt.verify(token, secret, {}, async (err, info) => {
+        if (err) throw err;
+        const { title, summary, content } = req.body;
+        const postDocument = await Post.create({
+            title,
+            summary,
+            content,
+            cover: newPath,
+            author:info.id,
+    
+        })
+        res.json(postDocument)
+    })
 
-const postDocument = await Post.create({
-    title,
-    summary,
-    content,
-    cover:newPath,
 
 })
-res.json(postDocument)
-})
 
-app.get('/post',async (req,res)=> {
-    const posts = await Post.find()
+app.get('/post', async (req, res) => {
+    const posts = await Post.find().populate('author',['username']).sort({createdAt: -1}).limit(20)
     res.json(posts);
 })
 

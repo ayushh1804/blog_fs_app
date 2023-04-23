@@ -1,13 +1,14 @@
-export default function Post({title,summary,cover,content,createdAt}) {
+import {format} from "date-fns";
+export default function Post({title,summary,cover,content,createdAt,author}) {
     return(
         <div className="posts">
-        <div className="image"><img src="https://images.pexels.com/photos/16066100/pexels-photo-16066100.jpeg?auto=compress&cs=tinysrgb&w=400&lazy=load" alt="" /></div>
+        <div className="image"><img src={'http://localhost:4000/'+ cover} alt="" /></div>
 
         <div className="texts">
           <h2>{title}</h2>
           <p className="info">
-            <a href="" className="author">author</a>
-            <time>{createdAt}</time>
+            <a href="" className="author">{author.username}</a>
+            <time>{format(new Date(createdAt), 'MMM d, yyyy HH:mm')}</time>
           </p>
           <p className='summary'>{summary}</p>
         </div>
